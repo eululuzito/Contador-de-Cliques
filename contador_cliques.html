@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Cliques</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+        }
+
+        .counter-box {
+            background: #00000055;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .count {
+            font-size: 6rem;
+            font-weight: bold;
+            color: #ffd966;
+            text-shadow: 0 0 20px #ffaa33;
+            margin: 0.5rem 0;
+            font-family: monospace;
+        }
+
+        .record {
+            font-size: 1.2rem;
+            background: #ffd96633;
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            color: #ffd966;
+            margin-top: 0.5rem;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        button {
+            background: #ffd966;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 3rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background: #ffcc44;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .reset-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: #c82333;
+        }
+
+        .click-btn {
+            background: #28a745;
+            color: white;
+            font-size: 1.5rem;
+            padding: 0.8rem 2rem;
+        }
+
+        .click-btn:hover {
+            background: #218838;
+        }
+
+        footer {
+            margin-top: 1.5rem;
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖱️ CONTADOR DE CLIQUES</h1>
+        <div class="counter-box">
+            <div class="count" id="contador">0</div>
+            <div class="record" id="recordLabel">🏆 Recorde: 0</div>
+        </div>
+        <div class="buttons">
+            <button class="click-btn" id="btnClick">👆 CLIQUE AQUI</button>
+            <button class="reset-btn" id="btnReset">🔄 Zerar</button>
+        </div>
+        <footer>O recorde é salvo automaticamente no seu navegador!</footer>
+    </div>
+
+    <script>
+        // Carrega os valores salvos no localStorage
+        let contador = localStorage.getItem('clickContador') ? parseInt(localStorage.getItem('clickContador')) : 0;
+        let recorde = localStorage.getItem('clickRecorde') ? parseInt(localStorage.getItem('clickRecorde')) : 0;
+
+        // Referências dos elementos HTML
+        const contadorElement = document.getElementById('contador');
+        const recordLabel = document.getElementById('recordLabel');
+        const btnClick = document.getElementById('btnClick');
+        const btnReset = document.getElementById('btnReset');
+
+        // Função para atualizar a interface
+        function atualizarUI() {
+            contadorElement.textContent = contador;
+            recordLabel.innerHTML = `🏆 Recorde: ${recorde}`;
+            
+            // Salva no localStorage sempre que atualizar
+            localStorage.setItem('clickContador', contador);
+            localStorage.setItem('clickRecorde', recorde);
+        }
+
+        // Verifica e atualiza o recorde
+        function verificarRecorde() {
+            if (contador > recorde) {
+                recorde = contador;
+                // Feedback visual para novo recorde
+                recordLabel.style.animation = 'none';
+                setTimeout(() => {
+                    recordLabel.style.animation = 'pulse 0.5s ease';
+                }, 10);
+            }
+            atualizarUI();
+        }
+
+        // Função para adicionar clique
+        function adicionarClique() {
+            contador++;
+            verificarRecorde();
+            
+            // Pequeno efeito de animação no botão
+            btnClick.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btnClick.style.transform = '';
+            }, 100);
+            
+            // Efeito de "pop" no número
+            contadorElement.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                contadorElement.style.transform = '';
+            }, 150);
+        }
+
+        // Função para resetar o contador atual (sem perder o recorde)
+        function resetarContador() {
+            if (contador !== 0) {
+                contador = 0;
+                atualizarUI();
+                
+                // Feedback visual
+                contadorElement.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    contadorElement.style.transform = '';
+                }, 200);
+            }
+        }
+
+        // Eventos dos botões
+        btnClick.addEventListener('click', adicionarClique);
+        btnReset.addEventListener('click', resetarContador);
+
+        // Animação de recorde via CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); background: #ffd96633; }
+                50% { transform: scale(1.05); background: #ffd966aa; color: #fff; }
+                100% { transform: scale(1); background: #ffd96633; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Inicializa a interface
+        atualizarUI();
+
+        // Dica extra: se quiser resetar TUDO (inclusive recorde), clique com botão direito no reset
+        btnReset.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            if (confirm('⚠️ Resetar TUDO? Isso vai zerar o contador E o recorde.')) {
+                contador = 0;
+                recorde = 0;
+                atualizarUI();
+            }
+        });
+    </script>
+</body>
+</html>
